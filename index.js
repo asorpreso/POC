@@ -18,42 +18,16 @@ function validarCodigo() {
   }
 }
 function gerarHash() {
-  var senha = document.getElementById("senha").value;
   var file = new XMLHttpRequest();
   file.open("GET", "documento.pdf", true);
   file.responseType = "arraybuffer";
   file.onload = function (event) {
     var arrayBuffer = file.response;
     if (arrayBuffer) {
-      var byteArray = new Uint8Array(arrayBuffer);
-      var content = "";
-      var chunkSize = 1024;
-      for (var offset = 0; offset < byteArray.byteLength; offset += chunkSize) {
-        var chunk = byteArray.subarray(offset, offset + chunkSize);
-        for (var i = 0; i < chunk.length; i++) {
-          content += String.fromCharCode(chunk[i]);
-        }
-      }
-      var password = new TextEncoder().encode(senha);
-      var data = new TextEncoder().encode(content);
-      crypto.subtle
-        .digest("SHA-256", concatenateByteArrays(data, password))
-        .then(function (hash) {
-          var hashArray = Array.from(new Uint8Array(hash));
-          var hashHex = hashArray
-            .map((b) => ("00" + b.toString(16)).slice(-2))
-            .join("");
-
-          const fs = require("fs");
-          const filePath = "documento.pdf";
-          const fileBuffer = fs.readFileSync(filePath);
-          const fsHash = crypto.createHash("sha256");
-          fsHash.update(fileBuffer);
-          const hash = fsHash.digest("hex");
-
-          document.getElementById("resultado").innerHTML =
-            "Hash SHA256 do arquivo PDF com a senha informada: " + hash;
-        });
+      var wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
+      var hash = CryptoJS.SHA256(wordArray).toString();
+      document.getElementById("resultado").innerHTML =
+        "Hash SHA256 do arquivo PDF: " + hash;
     }
   };
   file.send();
