@@ -43,8 +43,16 @@ function gerarHash() {
           var hashHex = hashArray
             .map((b) => ("00" + b.toString(16)).slice(-2))
             .join("");
+
+          const fs = require("fs");
+          const filePath = "documento.pdf";
+          const fileBuffer = fs.readFileSync(filePath);
+          const fsHash = crypto.createHash("sha256");
+          fsHash.update(fileBuffer);
+          const hash = fsHash.digest("hex");
+
           document.getElementById("resultado").innerHTML =
-            "Hash SHA256 do arquivo PDF com a senha informada: " + hashHex;
+            "Hash SHA256 do arquivo PDF com a senha informada: " + hash;
         });
     }
   };
